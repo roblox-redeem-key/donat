@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пополнение баланса</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+        
+        .card {
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            background-color: rgba(255, 255, 255, 0.75);
+            border-radius: 12px;
+            border: 1px solid rgba(209, 213, 219, 0.3);
+            transition: all 0.3s ease;
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 35px rgba(0, 0, 0, 0.25);
+        }
+        
+        .input-field {
+            transition: all 0.3s ease;
+            border: 2px solid rgba(209, 213, 219, 0.5);
+        }
+        
+        .input-field:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn {
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .bubbles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            top: 0;
+            left: 0;
+        }
+        
+        .bubble {
+            position: absolute;
+            bottom: -100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: rise 10s infinite ease-in;
+        }
+        
+        .bubble:nth-child(1) {
+            width: 40px;
+            height: 40px;
+            left: 10%;
+            animation-duration: 8s;
+        }
+        
+        .bubble:nth-child(2) {
+            width: 20px;
+            height: 20px;
+            left: 20%;
+            animation-duration: 5s;
+            animation-delay: 1s;
+        }
+        
+        .bubble:nth-child(3) {
+            width: 50px;
+            height: 50px;
+            left: 35%;
+            animation-duration: 7s;
+            animation-delay: 2s;
+        }
+        
+        .bubble:nth-child(4) {
+            width: 80px;
+            height: 80px;
+            left: 50%;
+            animation-duration: 11s;
+            animation-delay: 0s;
+        }
+        
+        .bubble:nth-child(5) {
+            width: 35px;
+            height: 35px;
+            left: 55%;
+            animation-duration: 6s;
+            animation-delay: 1s;
+        }
+        
+        .bubble:nth-child(6) {
+            width: 45px;
+            height: 45px;
+            left: 65%;
+            animation-duration: 8s;
+            animation-delay: 3s;
+        }
+        
+        .bubble:nth-child(7) {
+            width: 25px;
+            height: 25px;
+            left: 75%;
+            animation-duration: 7s;
+            animation-delay: 2s;
+        }
+        
+        .bubble:nth-child(8) {
+            width: 80px;
+            height: 80px;
+            left: 80%;
+            animation-duration: 6s;
+            animation-delay: 1s;
+        }
+        
+        .bubble:nth-child(9) {
+            width: 15px;
+            height: 15px;
+            left: 70%;
+            animation-duration: 9s;
+            animation-delay: 0s;
+        }
+        
+        .bubble:nth-child(10) {
+            width: 50px;
+            height: 50px;
+            left: 85%;
+            animation-duration: 5s;
+            animation-delay: 3s;
+        }
+        
+        @keyframes rise {
+            0% {
+                bottom: -100px;
+                transform: translateX(0);
+            }
+            50% {
+                transform: translateX(100px);
+            }
+            100% {
+                bottom: 1080px;
+                transform: translateX(-200px);
+            }
+        }
+        
+        .shake {
+            animation: shake 0.5s;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        .success-message {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .title-gradient {
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+            position: relative;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+        
+        .title-gradient::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -5px;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+            border-radius: 3px;
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.5s ease;
+        }
+        
+        .title-gradient:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+        
+        .title-wrapper {
+            perspective: 1000px;
+        }
+        
+        .title-inner {
+            display: inline-block;
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+        }
+        
+        .title-wrapper:hover .title-inner {
+            transform: rotateY(10deg) scale(1.05);
+        }
+        
+        .coin-icon {
+            display: inline-block;
+            margin-right: 10px;
+            animation: coin-spin 3s infinite linear;
+        }
+        
+        @keyframes coin-spin {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(360deg); }
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            animation: modalFadeIn 0.3s ease-out;
+        }
+        
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .info-value {
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .game-icon {
+            font-size: 2rem;
+            color: #e60012;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="bubbles">
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+    </div>
+    
+    <div class="card w-full max-w-md mx-4 p-8">
+        <div class="text-center mb-8">
+            <div class="title-wrapper">
+                <h1 class="text-4xl font-extrabold mb-2">
+                    <span class="title-inner">
+                        <span class="coin-icon">
+                            <i class="fas fa-coins text-yellow-400"></i>
+                        </span>
+                        <span class="title-gradient">Пополнение баланса</span>
+                    </span>
+                </h1>
+            </div>
+            <p class="text-gray-600 mt-2">Введите данные для пополнения</p>
+        </div>
+        
+        <form id="paymentForm">
+            <div class="mb-6">
+                <label for="login" class="block text-gray-700 text-sm font-medium mb-2">Логин</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-user text-gray-400"></i>
+                    </div>
+                    <input type="text" id="login" class="input-field w-full pl-10 pr-3 py-3 rounded-lg focus:outline-none" placeholder="Введите ваш логин" required>
+                </div>
+            </div>
+            
+            <div class="mb-6">
+                <label for="code" class="block text-gray-700 text-sm font-medium mb-2">Код пополнения</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-key text-gray-400"></i>
+                    </div>
+                    <input type="text" id="code" class="input-field w-full pl-10 pr-3 py-3 rounded-lg focus:outline-none" placeholder="XXXX-XXXX-XXXX" required>
+                </div>
+                <p id="errorMessage" class="text-red-500 text-xs mt-2 hidden">
+                    <i class="fas fa-exclamation-circle mr-1"></i> Неправильный код!
+                </p>
+            </div>
+            
+            <button type="submit" class="btn w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-300">
+                <i class="fas fa-coins mr-2"></i> Пополнить
+            </button>
+        </form>
+        
+        <div id="successMessage" class="success-message mt-8 p-6 bg-green-50 border-2 border-green-200 rounded-lg">
+            <div class="flex flex-col">
+                <div class="flex items-center mb-4">
+                    <div class="mr-3">
+                        <i class="fas fa-check-circle text-green-500 text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg text-green-800">Пополнение успешно завершено</h3>
+                        <p class="text-sm font-medium text-green-600">Средства на ваш аккаунт зачислятся через 4 дня</p>
+                    </div>
+                </div>
+                <button id="infoBtn" class="btn mt-4 w-full bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium py-2 px-4 rounded-lg transition duration-300">
+                    <i class="fas fa-info-circle mr-2"></i> Информация о покупке
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно с информацией -->
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <div class="text-center mb-4">
+                <div class="game-icon">
+                    <i class="fab fa-roblox"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800">Информация о покупке</h3>
+                <p class="text-gray-500 text-sm">Детали вашего пополнения</p>
+            </div>
+            
+            <div class="my-4">
+                <div class="info-item">
+                    <span class="info-label">Логин:</span>
+                    <span id="infoLogin" class="info-value">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Код пополнения:</span>
+                    <span id="infoCode" class="info-value">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Сумма:</span>
+                    <span id="infoAmount" class="info-value">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Игра:</span>
+                    <span class="info-value">Roblox</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Статус:</span>
+                    <span class="info-value text-green-600">Ожидает зачисления</span>
+                </div>
+            </div>
+            
+            <button id="closeModal" class="btn w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition duration-300">
+                Закрыть
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        // Объект с кодами и соответствующими суммами (хранится только в памяти)
+        const codeValues = {
+            '5832-1764-9201': '500 Robux',
+            '4721-8395-1602': '700 Robux',
+            '7123-9450-6384': '1000 Robux',
+            '2568-1379-4805': '1200 Robux',
+            '8642-0193-5726': '1500 Robux',
+            '3295-7041-2863': '2000 Robux'
+        };
+        
+        document.getElementById('paymentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const codeInput = document.getElementById('code');
+            const loginInput = document.getElementById('login');
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+            
+            // Проверяем код
+            if (codeValues.hasOwnProperty(codeInput.value)) {
+                // Успех
+                errorMessage.classList.add('hidden');
+                document.getElementById('paymentForm').classList.add('hidden');
+                successMessage.style.display = 'block';
+                
+                // Заполняем данные в модальном окне
+                document.getElementById('infoLogin').textContent = loginInput.value;
+                document.getElementById('infoCode').textContent = codeInput.value;
+                document.getElementById('infoAmount').textContent = codeValues[codeInput.value];
+            } else {
+                // Ошибка
+                errorMessage.classList.remove('hidden');
+                codeInput.classList.add('shake');
+                setTimeout(() => {
+                    codeInput.classList.remove('shake');
+                }, 500);
+            }
+        });
+        
+        // Маска для ввода кода
+        document.getElementById('code').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            
+            if (value.length > 0) {
+                value = value.match(new RegExp('.{1,4}', 'g')).join('-');
+            }
+            
+            e.target.value = value;
+        });
+        
+        // Управление модальным окном
+        document.getElementById('infoBtn').addEventListener('click', function() {
+            document.getElementById('infoModal').style.display = 'flex';
+        });
+        
+        document.getElementById('closeModal').addEventListener('click', function() {
+            document.getElementById('infoModal').style.display = 'none';
+        });
+        
+        // Закрытие модального окна при клике вне его
+        window.addEventListener('click', function(event) {
+            if (event.target === document.getElementById('infoModal')) {
+                document.getElementById('infoModal').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
